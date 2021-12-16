@@ -34,16 +34,18 @@ for pdf in sorted(input_pdfs):
             page_text = page.extractText()
 
             regex_match = re.search(regex_pattern, page_text)
-            regex_group = regex_match.groupdict()
-            student_number = int(regex_group.get("LocalStudentIdentification"))
+            if regex_match:
+                regex_group = regex_match.groupdict()
+            else:
+                regex_group = {}
+            student_number = int(regex_group.get("LocalStudentIdentification", "0"))
 
             student_match = next(
                 iter(
                     [s for s in student_lookup if s["student_number"] == student_number]
                 ),
                 {
-                    "student_number": 999999,
-                    "grade_level": 99,
+                    "student_number": p,
                     "abbreviation": "UNMATCHED",
                 },
             )
@@ -67,4 +69,4 @@ for pdf in sorted(input_pdfs):
                     pdf_out.write(f)
 
     pdf.rename(pdf.parent / "processed" / pdf.name)
-    print(f"\tMoved to ./{'processed' / pdf.name}")
+    print(f"Moved to ./processed/{pdf.name}")
